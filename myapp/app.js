@@ -28,26 +28,34 @@ app.post('/',function(req,res){
   res.render('home');
 
 });
+app.get('/registration',function (req,res){
+  res.render('registration');
 
-
-var x={name:"Ali",age:27,username:"ali2",password:"pass"};
-var y=JSON.stringify(x);
-fs.writeFileSync("users.json",y);
-
-var data=fs.readFileSync("users.json");
-var z= JSON.parse(data);
-
-
-var MongoClient= require('mongodb').MongoClient;
-MongoClient.connect("mongodb://127.0.0.1:27017",function(err,client){
-  if (err) throw err;
-  var db=client.db("MyDB");
-  db.collection("FirstCollection").insertOne({id:1,firstName: 'name11',lastName: 'name21'});
-  db.collection("FirstCollection").find().toArray(function(err,results){
-    console.log(results);
-  });
 });
 
+// var x={name:"Ali",age:27,username:"ali2",password:"pass"};
+// var y=JSON.stringify(x);
+// fs.writeFileSync("users.json",y);
+
+// var data=fs.readFileSync("users.json");
+// var z= JSON.parse(data);
+
+app.post('/register',function(req,res){
+  console.log('here');
+  var x =req.body.username
+  var y =req.body.password
+  console.log(x);
+  console.log(y);
+  var MongoClient= require('mongodb').MongoClient;
+  MongoClient.connect("mongodb://127.0.0.1:27017",function(err,client){
+    if (err) throw err;
+    var db=client.db("MyDB");
+    db.collection("FirstCollection").insertOne({id:1,username: x,password: y});
+    db.collection("FirstCollection").find().toArray(function(err,results){
+    console.log(results);
+    });
+  });
+});
 //search  Access MongoDV in Node.js
 
 const PORT = process.env.PORT || 3000;
@@ -56,5 +64,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`server started on port ${PORT}`);
 });
+
+//https://networks-abf9.onrender.com/
 
 
