@@ -50,12 +50,11 @@ MongoClient.connect("mongodb://127.0.0.1:27017",function(err,client){
 
 //search  Access MongoDV in Node.js
 
-const PORT = process.env.PORT || 3030;
+const PORT = process.env.PORT || 3000;
 
 
 app.listen(PORT, () => {
   console.log(`server started on port ${PORT}`);
 });
 
-app.listen(3000);
 
