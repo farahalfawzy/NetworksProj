@@ -55,7 +55,7 @@ app.post('/register', function (req, res) {
         res.render('registration',{messageReg:"This user already exists"});
       }
       else{
-        if(user != "" && password !=0){
+        if(user != "" && password !=""){
           db.collection('FirstCollection').insertOne({ "Name": user, "password": password });
           global.registered=true;
           return res.redirect('/');
