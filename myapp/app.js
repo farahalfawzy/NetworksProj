@@ -12,7 +12,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-//login page
+//login page lol
 app.get('/', function (req, res) {
   if(global.registered)
     res.render('login',{msg:'You have registered successfully'});
