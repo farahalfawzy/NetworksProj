@@ -1,6 +1,8 @@
 var express = require('express');
 var path = require('path');
 var app = express();
+var fs=require('fs');
+
 global.registered=false;
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -10,6 +12,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+//deploy
+if (process.env.PORT) {
+  app.listen(process.env.PORT, function () { console.log('Server started') });
+}
+else {
+  app.listen(3000, function () { console.log('Server started on port 3000') });
+}
+
 
 //login page
 app.get('/', function (req, res) {
@@ -17,6 +27,34 @@ app.get('/', function (req, res) {
     res.render('login',{msg:'You have registered successfully'});
   else
     res.render('login',{msg:''});
+});
+app.post('/',function(req,res){
+  var x=req.body.username;
+  var y =req.body.password;
+  if(x == "" || y == "")
+      res.render('login',{msg:"You must enter a valid input!"});
+ else if (x=="admin" && y=="admin"){
+    res.render('home');
+  }
+  else{
+  var MongoClient = require('mongodb').MongoClient;
+MongoClient.connect("mongodb://127.0.0.1:27017/", function (err, client) {
+  if (err) throw err;
+  var db = client.db('myDB');
+  db.collection('myCollection').find().toArray(function (err, items) {
+    if (err) throw err;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].username == x && items[i].password==y){
+        res.render('home');
+      }
+     if(items[i].username == x && items[i].password!=y){
+     res.render('login',{msg:"wrong password"});
+    } 
+}
+res.render('login',{msg:"you are not registered please click on i don't have an account"});
+    });
+});
+  }
 });
 
 
@@ -40,9 +78,9 @@ app.post('/register', function (req, res) {
   var MongoClient = require('mongodb').MongoClient;
   MongoClient.connect("mongodb://127.0.0.1:27017/", function (err, client) {
     if (err) throw err;
-    var db = client.db('MyDB');
+    var db = client.db('myDB');
 
-    db.collection('FirstCollection').find().toArray(function (err, items) {
+    db.collection('myCollection').find().toArray(function (err, items) {
       if (err) throw err;
       for (let i = 0; i < items.length; i++) {
         if (items[i].Name == user){
@@ -56,7 +94,7 @@ app.post('/register', function (req, res) {
       }
       else{
         if(user != "" && password !=""){
-          db.collection('FirstCollection').insertOne({ "Name": user, "password": password });
+          db.collection('myCollection').insertOne({ "username": user, "password": password });
           global.registered=true;
           return res.redirect('/');
         }
@@ -64,15 +102,6 @@ app.post('/register', function (req, res) {
     });
   });
 });
-//push trail
-
-
-if (process.env.PORT) {
-  app.listen(process.env.PORT, function () { console.log('Server started') });
-}
-else {
-  app.listen(3000, function () { console.log('Server started on port 3000') });
-}
 
 //rendering the pages
 app.get("/islands",function(req,res){
@@ -105,3 +134,24 @@ app.get("/santorini",function(req,res){
 app.get('/wanttogo',function(req,res){
   res.render('wanttogo')
 })
+app.get('/searchresults',function(req,res){
+  res.render('searchresults')
+})
+
+//search bar 
+app.post('/search', function (req, res) {
+  userinput=req.body.Search;
+  var data=fs.readFileSync("destinations.json");
+  var destinations= JSON.parse(data);
+  let output=[];
+  for(let i=0;i<destinations.length;i++){
+    let dest=destinations[i].name;
+    if (dest.toLowerCase().includes(userinput.toLowerCase())){
+      output.push(destinations[i]);
+    }  
+  }
+ 
+  res.render('searchresults',{result:output});
+
+});
+

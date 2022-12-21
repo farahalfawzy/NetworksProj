@@ -13,6 +13,17 @@
             text-align: center;
             -webkit-text-stroke: 1px blue;
         }
+        ul {
+            list-style-type: none;
+         }
+         li:not(:last-child) {
+        margin-bottom: 10px;
+        }
+        a {font-size: 20px}
+        h5{
+            font-size: 30 px;
+            color: rgb(191, 255, 161);
+        }
     </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,5 +49,18 @@
             </form>
         </div>
     </nav>
+    <ul>
+        <% if (result.length>0){ %>
+        <% for(var i=0 ; i< result.length ; i++ ) { %>
+                <li>
+                    <img id="image" src="/<%-result[i].value%>.png" width="100" height="100">
+                    <a href= "/<%-result[i].value%>" ><%- result[i].name %></a><li></li>
+                 </li>
+        <% }; %>
+        <% }; %>
+        <% if (result.length==0) { %>
+            <h5>Destination not Found</h5>
+        <% }; %>        
+    </ul>
 </body>
 </html>
