@@ -43,14 +43,20 @@ MongoClient.connect("mongodb://127.0.0.1:27017/", function (err, client) {
   var db = client.db('myDB');
   db.collection('myCollection').find().toArray(function (err, items) {
     if (err) throw err;
+    let flag=false;
     for (let i = 0; i < items.length; i++) {
       if (items[i].username == x && items[i].password==y){
+        flag=true;
         res.render('home');
+        break;
       }
      if(items[i].username == x && items[i].password!=y){
+      flag=true;
      res.render('login',{msg:"wrong password"});
+     break;
     } 
 }
+if (!flag)
 res.render('login',{msg:"you are not registered please click on i don't have an account"});
     });
 });
@@ -138,7 +144,7 @@ app.get('/searchresults',function(req,res){
   res.render('searchresults')
 })
 
-//search bar 
+//search bar
 app.post('/search', function (req, res) {
   userinput=req.body.Search;
   var data=fs.readFileSync("destinations.json");
@@ -150,8 +156,9 @@ app.post('/search', function (req, res) {
       output.push(destinations[i]);
     }  
   }
- 
   res.render('searchresults',{result:output});
+
+
 
 });
 
