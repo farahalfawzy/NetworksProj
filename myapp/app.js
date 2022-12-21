@@ -103,6 +103,5 @@ app.get("/santorini",function(req,res){
   res.render('santorini');
 });
 app.get('/wanttogo',function(req,res){
-
   res.render('wanttogo')
 })
