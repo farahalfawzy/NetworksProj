@@ -102,7 +102,7 @@ app.post('/register', function (req, res) {
         if(user != "" && password !=""){
           db.collection('myCollection').insertOne({ "username": user, "password": password });
           global.registered=true;
-          return res.redirect('/');
+          return res.redirect('/'); 
         }
       }
     });
@@ -154,10 +154,9 @@ app.post('/search', function (req, res) {
     let dest=destinations[i].name;
     if (dest.toLowerCase().includes(userinput.toLowerCase())){
       output.push(destinations[i]);
-    }  
+    }
   }
   res.render('searchresults',{result:output});
-
 
 
 });
