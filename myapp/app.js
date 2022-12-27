@@ -94,6 +94,7 @@ app.post('/register', function (req, res) {
         for (let i = 0; i < items.length; i++) {
           if (items[i].username == user) {
             flag = true;
+            break;
           }
         }
         if (flag) {
