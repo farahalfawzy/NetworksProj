@@ -2,8 +2,10 @@ var express = require('express');
 var path = require('path');
 var app = express();
 var fs = require('fs');
+var JSAlert = require("js-alert");
 
 global.registered = false;
+global.username = ""
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -47,6 +49,7 @@ app.post('/', function (req, res) {
         for (let i = 0; i < items.length; i++) {
           if (items[i].username == x && items[i].password == y) {
             flag = true;
+            global.username = x;
             res.render('home');
             break;
           }
@@ -101,7 +104,7 @@ app.post('/register', function (req, res) {
           res.render('registration', { messageReg: "This user already exists" });
         }
         else {
-          db.collection('myCollection').insertOne({ "username": user, "password": password });
+          db.collection('myCollection').insertOne({ "username": user, "password": password, "wanttogolist": [] });
           global.registered = true;
           return res.redirect('/');
         }
@@ -138,9 +141,6 @@ app.get("/bali", function (req, res) {
 app.get("/santorini", function (req, res) {
   res.render('santorini');
 });
-app.get('/wanttogo', function (req, res) {
-  res.render('wanttogo')
-})
 app.get('/searchresults', function (req, res) {
   res.render('searchresults')
 })
@@ -161,4 +161,177 @@ app.post('/search', function (req, res) {
 
 
 });
+
+// wantto go list 
+
+app.get('/wanttogo', function (req, res) {
+  var MongoClient = require('mongodb').MongoClient;
+  var output = [];
+  MongoClient.connect("mongodb://127.0.0.1:27017/", function (err, client) {
+    if (err) throw err;
+    var db = client.db('myDB');
+    db.collection('myCollection').find().toArray(function (err, items) {
+      if (err) throw err;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].username == global.username) {
+          for (let j = 0; j < items[i].wanttogolist.length; j++) {
+            output.push(items[i].wanttogolist[j]);
+            console.log("output123", output);
+          }
+          console.log("was here", items[i].wanttogolist);
+
+          break;
+        }
+      }
+      res.render('wanttogo', { result: output })
+    });
+  });
+  console.log("output", output);
+})
+app.post('/bali', function (req, res) {
+  var MongoClient = require('mongodb').MongoClient;
+
+  MongoClient.connect("mongodb://127.0.0.1:27017/", function (err, client) {
+    if (err) throw err;
+    var db = client.db('myDB');
+
+    db.collection('myCollection').find().toArray(function (err, items) {
+      if (err) throw err;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].username == global.username) {
+          if (!items[i].wanttogolist.includes('bali')) {
+            items[i].wanttogolist.push("bali");
+            db.collection('myCollection').update({ "username": global.username },
+              { $set: { "wanttogolist": items[i].wanttogolist } });
+            break;
+          }
+        }
+      }
+    });
+  });
+  res.render('bali');
+})
+
+app.post('/santorini', function (req, res) {
+  var MongoClient = require('mongodb').MongoClient;
+
+  MongoClient.connect("mongodb://127.0.0.1:27017/", function (err, client) {
+    if (err) throw err;
+    var db = client.db('myDB');
+
+    db.collection('myCollection').find().toArray(function (err, items) {
+      if (err) throw err;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].username == global.username) {
+          if (!items[i].wanttogolist.includes('santorini')) {
+            items[i].wanttogolist.push("santorini");
+            db.collection('myCollection').update({ "username": global.username },
+              { $set: { "wanttogolist": items[i].wanttogolist } });
+            break;
+          }
+        }
+      }
+    });
+  });
+  res.render('santorini');
+})
+
+app.post('/paris', function (req, res) {
+  var MongoClient = require('mongodb').MongoClient;
+
+  MongoClient.connect("mongodb://127.0.0.1:27017/", function (err, client) {
+    if (err) throw err;
+    var db = client.db('myDB');
+
+    db.collection('myCollection').find().toArray(function (err, items) {
+      if (err) throw err;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].username == global.username) {
+          if (!items[i].wanttogolist.includes('paris')) {
+            items[i].wanttogolist.push("paris");
+            db.collection('myCollection').update({ "username": global.username },
+              { $set: { "wanttogolist": items[i].wanttogolist } });
+            break;
+          }
+        }
+      }
+    });
+  });
+  res.render('paris');
+})
+
+app.post('/rome', function (req, res) {
+  var MongoClient = require('mongodb').MongoClient;
+
+  MongoClient.connect("mongodb://127.0.0.1:27017/", function (err, client) {
+    if (err) throw err;
+    var db = client.db('myDB');
+
+    db.collection('myCollection').find().toArray(function (err, items) {
+      if (err) throw err;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].username == global.username) {
+          if (!items[i].wanttogolist.includes('rome')) {
+            items[i].wanttogolist.push("rome");
+            db.collection('myCollection').update({ "username": global.username },
+              { $set: { "wanttogolist": items[i].wanttogolist } });
+            break;
+          }
+        }
+      }
+    });
+  });
+  res.render('rome');
+})
+
+
+app.post('/inca', function (req, res) {
+  var MongoClient = require('mongodb').MongoClient;
+
+  MongoClient.connect("mongodb://127.0.0.1:27017/", function (err, client) {
+    if (err) throw err;
+    var db = client.db('myDB');
+
+    db.collection('myCollection').find().toArray(function (err, items) {
+      if (err) throw err;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].username == global.username) {
+          if (!items[i].wanttogolist.includes('inca')) {
+            console.log("true");
+            items[i].wanttogolist.push("inca");
+            db.collection('myCollection').update({ "username": global.username },
+              { $set: { "wanttogolist": items[i].wanttogolist } });
+            break;
+          }
+        }
+      }
+    });
+  });
+  res.render('inca');
+})
+
+app.post('/annapurna', function (req, res) {
+  var MongoClient = require('mongodb').MongoClient;
+
+  MongoClient.connect("mongodb://127.0.0.1:27017/", function (err, client) {
+    if (err) throw err;
+    var db = client.db('myDB');
+
+    db.collection('myCollection').find().toArray(function (err, items) {
+      if (err) throw err;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].username == global.username) {
+          if (!items[i].wanttogolist.includes('annapurna')) {
+            items[i].wanttogolist.push("annapurna");
+            db.collection('myCollection').update({ "username": global.username },
+              { $set: { "wanttogolist": items[i].wanttogolist } });
+            break;
+          }
+        }
+      }
+    });
+  });
+  res.render('annapurna');
+})
+
 
