@@ -49,7 +49,7 @@ app.post('/', function (req, res) {
           if (items[i].username == x && items[i].password == y) {
             flag = true;
             global.username = x;
-            res.render('home');
+            res.redirect('home');
             break;
           }
           if (items[i].username == x && items[i].password != y) {
@@ -123,7 +123,7 @@ app.get("/hiking", function (req, res) {
   res.render('hiking');
 });
 app.get("/inca", function (req, res) {
-  res.render('inca', { message:"" });
+  res.render('inca', { message: "" });
 });
 app.get("/annapurna", function (req, res) {
   res.render('annapurna', { message: "" });
@@ -288,7 +288,7 @@ app.post('/rome', function (req, res) {
             break;
           }
           else {
-            res.render("rome",{message:"rome already in the basket"});
+            res.render("rome", { message: "rome already in the basket" });
           }
         }
       }
@@ -313,11 +313,11 @@ app.post('/inca', function (req, res) {
             items[i].wanttogolist.push("inca");
             db.collection('myCollection').update({ "username": global.username },
               { $set: { "wanttogolist": items[i].wanttogolist } });
-              res.render('inca',{message:""});
+            res.render('inca', { message: "" });
             break;
           }
-          else{
-            res.render('inca',{message:"inca already in the basket"});
+          else {
+            res.render('inca', { message: "inca already in the basket" });
           }
         }
       }
@@ -340,14 +340,25 @@ app.post('/annapurna', function (req, res) {
             items[i].wanttogolist.push("annapurna");
             db.collection('myCollection').update({ "username": global.username },
               { $set: { "wanttogolist": items[i].wanttogolist } });
-              res.render('annapurna',{message:""});
+            res.render('annapurna', { message: "" });
             break;
           }
-          else{
-            res.render('annapurna',{message:"annapurna already in the basket"});
+          else {
+            res.render('annapurna', { message: "annapurna already in the basket" });
           }
         }
       }
     });
   });
 })
+
+function authenticationMiddleware() {
+  return (req, res, next) => {
+    console.log(`
+            req.session.passport.user: ${JSON.
+        stringify(req.session.passport)}`);
+    if (req.isAuthenticated()) return next(
+    );
+    res.redirect('/login')
+  }
+}//3lshan lw elragel 7awel y5osh mn3'yr ma y3ml login
