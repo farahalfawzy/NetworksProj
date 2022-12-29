@@ -2,7 +2,6 @@ var express = require('express');
 var path = require('path');
 var app = express();
 var fs = require('fs');
-var JSAlert = require("js-alert");
 
 global.registered = false;
 global.username = ""
@@ -124,22 +123,22 @@ app.get("/hiking", function (req, res) {
   res.render('hiking');
 });
 app.get("/inca", function (req, res) {
-  res.render('inca');
+  res.render('inca', { message:"" });
 });
 app.get("/annapurna", function (req, res) {
-  res.render('annapurna');
+  res.render('annapurna', { message: "" });
 });
 app.get("/paris", function (req, res) {
-  res.render('paris');
+  res.render('paris', { message: "" });
 });
 app.get("/rome", function (req, res) {
-  res.render('rome');
+  res.render('rome', { message: "" });
 });
 app.get("/bali", function (req, res) {
-  res.render('bali');
+  res.render('bali', { message: "" });
 });
 app.get("/santorini", function (req, res) {
-  res.render('santorini');
+  res.render('santorini', { message: "" });
 });
 app.get('/searchresults', function (req, res) {
   res.render('searchresults')
@@ -203,13 +202,17 @@ app.post('/bali', function (req, res) {
             items[i].wanttogolist.push("bali");
             db.collection('myCollection').update({ "username": global.username },
               { $set: { "wanttogolist": items[i].wanttogolist } });
+            res.render('bali', { message: "" });
             break;
+          }
+          else {
+            res.render('bali', { message: "Bali already exists in the wish" });
           }
         }
       }
     });
   });
-  res.render('bali');
+
 })
 
 app.post('/santorini', function (req, res) {
@@ -227,13 +230,16 @@ app.post('/santorini', function (req, res) {
             items[i].wanttogolist.push("santorini");
             db.collection('myCollection').update({ "username": global.username },
               { $set: { "wanttogolist": items[i].wanttogolist } });
+            res.render('santorini', { message: "" });
             break;
+          }
+          else {
+            res.render('santorini', { message: "santorini already in the basket" });
           }
         }
       }
     });
   });
-  res.render('santorini');
 })
 
 app.post('/paris', function (req, res) {
@@ -251,13 +257,16 @@ app.post('/paris', function (req, res) {
             items[i].wanttogolist.push("paris");
             db.collection('myCollection').update({ "username": global.username },
               { $set: { "wanttogolist": items[i].wanttogolist } });
+            res.render('paris', { message: "" });
             break;
+          }
+          else {
+            res.render('paris', { message: "paris already in the basket" });
           }
         }
       }
     });
   });
-  res.render('paris');
 })
 
 app.post('/rome', function (req, res) {
@@ -275,13 +284,16 @@ app.post('/rome', function (req, res) {
             items[i].wanttogolist.push("rome");
             db.collection('myCollection').update({ "username": global.username },
               { $set: { "wanttogolist": items[i].wanttogolist } });
+            res.render('rome', { message: "" });
             break;
+          }
+          else {
+            res.render("rome",{message:"rome already in the basket"});
           }
         }
       }
     });
   });
-  res.render('rome');
 })
 
 
@@ -301,13 +313,16 @@ app.post('/inca', function (req, res) {
             items[i].wanttogolist.push("inca");
             db.collection('myCollection').update({ "username": global.username },
               { $set: { "wanttogolist": items[i].wanttogolist } });
+              res.render('inca',{message:""});
             break;
+          }
+          else{
+            res.render('inca',{message:"inca already in the basket"});
           }
         }
       }
     });
   });
-  res.render('inca');
 })
 
 app.post('/annapurna', function (req, res) {
@@ -325,13 +340,14 @@ app.post('/annapurna', function (req, res) {
             items[i].wanttogolist.push("annapurna");
             db.collection('myCollection').update({ "username": global.username },
               { $set: { "wanttogolist": items[i].wanttogolist } });
+              res.render('annapurna',{message:""});
             break;
+          }
+          else{
+            res.render('annapurna',{message:"annapurna already in the basket"});
           }
         }
       }
     });
   });
-  res.render('annapurna');
 })
-
-
