@@ -2,9 +2,19 @@ var express = require('express');
 var path = require('path');
 var app = express();
 var fs = require('fs');
+const sessions = require('express-session');  //mn hna
+const cookieParser = require("cookie-parser");
+const oneDay = 1000 * 60 * 60 * 24;
+app.use(sessions({
+  secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
+  saveUninitialized: true,
+  cookie: { maxAge: oneDay },
+  resave: false
+}));
+var session;                                  //lhna gdeeda
 
 global.registered = false;
-global.username = ""
+// global.username = ""
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -12,6 +22,7 @@ app.set('view engine', 'ejs');
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cookieParser());  //gdeeda
 
 //deploy
 if (process.env.PORT) {
@@ -30,12 +41,12 @@ app.get('/', function (req, res) {
     res.render('login', { msg: '' });
 });
 app.post('/', function (req, res) {
-  var x = req.body.username;
-  var y = req.body.password;
-  if (x == "" || y == "")
+  var username = req.body.username;
+  var password = req.body.password;
+  if (username == "" || password == "")
     res.render('login', { msg: "You must enter a valid input!" });
-  else if (x == "admin" && y == "admin") {
-    res.render('home');
+  else if (username == "admin" && password == "admin") {
+    res.redirect('home');
   }
   else {
     var MongoClient = require('mongodb').MongoClient;
@@ -46,13 +57,15 @@ app.post('/', function (req, res) {
         if (err) throw err;
         let flag = false;
         for (let i = 0; i < items.length; i++) {
-          if (items[i].username == x && items[i].password == y) {
+          if (items[i].username == username && items[i].password == password) {
             flag = true;
-            global.username = x;
+            // // global.username = x;
+            session = req.session;
+            session.userid = username;
             res.redirect('home');
             break;
           }
-          if (items[i].username == x && items[i].password != y) {
+          if (items[i].username == username && items[i].password != password) {
             flag = true;
             res.render('login', { msg: "wrong password" });
             break;
@@ -69,9 +82,19 @@ app.post('/', function (req, res) {
 
 //home page
 app.get('/home', function (req, res) {
-  res.render('home');
+  if (req.session.userid) {
+    res.render('home');
+  }
+  else {
+    res.redirect('index', { title: "Forbidden Access!" });
+  }
 });
-
+app.get('/index', function (req, res) {
+  res.render('index', { title: "Forbidden Access!" });
+})
+app.post('/index', function (req, res) {
+  res.redirect('/', { msg: "" });
+})
 
 
 //registration page
@@ -112,36 +135,76 @@ app.post('/register', function (req, res) {
   }
 });
 
-//rendering the pages
+//rendering the pages     3'yrt hna kolo
 app.get("/islands", function (req, res) {
-  res.render('islands');
+  session = req.session;
+  if (session.userid)
+    res.render('islands');
+  else
+    res.redirect('/index', { title: "Forbidden Access" });
 });
 app.get("/cities", function (req, res) {
-  res.render('cities');
+  session = req.session;
+  if (session.userid)
+    res.render('cities');
+  else
+    res.redirect('/index', { title: "Forbidden Access" });
 });
 app.get("/hiking", function (req, res) {
-  res.render('hiking');
+  session = req.session;
+  if (session.userid)
+    res.render('hiking');
+  else
+    res.redirect('/index', { title: "Forbidden Access" });
 });
 app.get("/inca", function (req, res) {
-  res.render('inca', { message: "" });
+  session = req.session;
+  if (session.userid)
+    res.render('inca',{message:""});
+  else
+    res.redirect('/index', { title: "Forbidden Access" });
 });
 app.get("/annapurna", function (req, res) {
-  res.render('annapurna', { message: "" });
+  session = req.session;
+  if (session.userid)
+    res.render('annapurna',{message:""});
+  else
+    res.redirect('/index', { title: "Forbidden Access" });
 });
 app.get("/paris", function (req, res) {
-  res.render('paris', { message: "" });
+  session = req.session;
+  if (session.userid)
+    res.render('paris',{message:""});
+  else
+    res.redirect('/index', { title: "Forbidden Access" });
 });
 app.get("/rome", function (req, res) {
-  res.render('rome', { message: "" });
+  session = req.session;
+  if (session.userid)
+    res.render('rome',{message:""});
+  else
+    res.redirect('/index', { title: "Forbidden Access" });
 });
 app.get("/bali", function (req, res) {
-  res.render('bali', { message: "" });
+  session = req.session;
+  if (session.userid)
+    res.render('bali',{message:""});
+  else
+    res.redirect('/index', { title: "Forbidden Access" });
 });
 app.get("/santorini", function (req, res) {
-  res.render('santorini', { message: "" });
+  session = req.session;
+  if (session.userid)
+    res.render('santorini',{message:""});
+  else
+    res.redirect('/index', { title: "Forbidden Access" });
 });
 app.get('/searchresults', function (req, res) {
-  res.render('searchresults')
+  session = req.session;
+  if (session.userid)
+    res.render('searchresults');
+  else
+    res.redirect('/index', { title: "Forbidden Access" });
 })
 
 //search bar
@@ -164,32 +227,37 @@ app.post('/search', function (req, res) {
 // wantto go list 
 
 app.get('/wanttogo', function (req, res) {
-  var MongoClient = require('mongodb').MongoClient;
-  var output = [];
-  MongoClient.connect("mongodb://127.0.0.1:27017/", function (err, client) {
-    if (err) throw err;
-    var db = client.db('myDB');
-    db.collection('myCollection').find().toArray(function (err, items) {
+  session = req.session;
+  if (session.userid) {
+    var MongoClient = require('mongodb').MongoClient;
+    var output = [];
+    MongoClient.connect("mongodb://127.0.0.1:27017/", function (err, client) {
       if (err) throw err;
-      for (let i = 0; i < items.length; i++) {
-        if (items[i].username == global.username) {
-          for (let j = 0; j < items[i].wanttogolist.length; j++) {
-            output.push(items[i].wanttogolist[j]);
-            console.log("output123", output);
-          }
-          console.log("was here", items[i].wanttogolist);
+      var db = client.db('myDB');
+      db.collection('myCollection').find().toArray(function (err, items) {
+        if (err) throw err;
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].username == session.userid) {
+            for (let j = 0; j < items[i].wanttogolist.length; j++) {
+              output.push(items[i].wanttogolist[j]);
+              console.log("output123", output);
+            }
+            console.log("was here", items[i].wanttogolist);
 
-          break;
+            break;
+          }
         }
-      }
-      res.render('wanttogo', { result: output })
+        res.render('wanttogo', { result: output })
+      });
     });
-  });
-  console.log("output", output);
+    console.log("output", output);
+  }
+  else
+    res.redirect('index',{title:"Forbidden Access!"});
 })
 app.post('/bali', function (req, res) {
   var MongoClient = require('mongodb').MongoClient;
-
+  session = req.session;
   MongoClient.connect("mongodb://127.0.0.1:27017/", function (err, client) {
     if (err) throw err;
     var db = client.db('myDB');
@@ -197,10 +265,10 @@ app.post('/bali', function (req, res) {
     db.collection('myCollection').find().toArray(function (err, items) {
       if (err) throw err;
       for (let i = 0; i < items.length; i++) {
-        if (items[i].username == global.username) {
+        if (items[i].username == session.userid) {
           if (!items[i].wanttogolist.includes('bali')) {
             items[i].wanttogolist.push("bali");
-            db.collection('myCollection').update({ "username": global.username },
+            db.collection('myCollection').update({ "username": session.userid },
               { $set: { "wanttogolist": items[i].wanttogolist } });
             res.render('bali', { message: "" });
             break;
@@ -217,7 +285,7 @@ app.post('/bali', function (req, res) {
 
 app.post('/santorini', function (req, res) {
   var MongoClient = require('mongodb').MongoClient;
-
+  session = req.session;      //hna
   MongoClient.connect("mongodb://127.0.0.1:27017/", function (err, client) {
     if (err) throw err;
     var db = client.db('myDB');
@@ -225,10 +293,10 @@ app.post('/santorini', function (req, res) {
     db.collection('myCollection').find().toArray(function (err, items) {
       if (err) throw err;
       for (let i = 0; i < items.length; i++) {
-        if (items[i].username == global.username) {
+        if (items[i].username == session.userid) {      //boso
           if (!items[i].wanttogolist.includes('santorini')) {
             items[i].wanttogolist.push("santorini");
-            db.collection('myCollection').update({ "username": global.username },
+            db.collection('myCollection').update({ "username": session.userid },
               { $set: { "wanttogolist": items[i].wanttogolist } });
             res.render('santorini', { message: "" });
             break;
@@ -244,7 +312,7 @@ app.post('/santorini', function (req, res) {
 
 app.post('/paris', function (req, res) {
   var MongoClient = require('mongodb').MongoClient;
-
+  session = req.session;        //boso
   MongoClient.connect("mongodb://127.0.0.1:27017/", function (err, client) {
     if (err) throw err;
     var db = client.db('myDB');
@@ -252,10 +320,10 @@ app.post('/paris', function (req, res) {
     db.collection('myCollection').find().toArray(function (err, items) {
       if (err) throw err;
       for (let i = 0; i < items.length; i++) {
-        if (items[i].username == global.username) {
+        if (items[i].username == session.userid) {
           if (!items[i].wanttogolist.includes('paris')) {
             items[i].wanttogolist.push("paris");
-            db.collection('myCollection').update({ "username": global.username },
+            db.collection('myCollection').update({ "username": session.userid },    //boso
               { $set: { "wanttogolist": items[i].wanttogolist } });
             res.render('paris', { message: "" });
             break;
@@ -271,7 +339,7 @@ app.post('/paris', function (req, res) {
 
 app.post('/rome', function (req, res) {
   var MongoClient = require('mongodb').MongoClient;
-
+  session = req.session;
   MongoClient.connect("mongodb://127.0.0.1:27017/", function (err, client) {
     if (err) throw err;
     var db = client.db('myDB');
@@ -279,10 +347,10 @@ app.post('/rome', function (req, res) {
     db.collection('myCollection').find().toArray(function (err, items) {
       if (err) throw err;
       for (let i = 0; i < items.length; i++) {
-        if (items[i].username == global.username) {
+        if (items[i].username == session) {
           if (!items[i].wanttogolist.includes('rome')) {
             items[i].wanttogolist.push("rome");
-            db.collection('myCollection').update({ "username": global.username },
+            db.collection('myCollection').update({ "username": session.userid },
               { $set: { "wanttogolist": items[i].wanttogolist } });
             res.render('rome', { message: "" });
             break;
@@ -299,7 +367,7 @@ app.post('/rome', function (req, res) {
 
 app.post('/inca', function (req, res) {
   var MongoClient = require('mongodb').MongoClient;
-
+  session = req.session;
   MongoClient.connect("mongodb://127.0.0.1:27017/", function (err, client) {
     if (err) throw err;
     var db = client.db('myDB');
@@ -307,11 +375,11 @@ app.post('/inca', function (req, res) {
     db.collection('myCollection').find().toArray(function (err, items) {
       if (err) throw err;
       for (let i = 0; i < items.length; i++) {
-        if (items[i].username == global.username) {
+        if (items[i].username == session.userid) {
           if (!items[i].wanttogolist.includes('inca')) {
             console.log("true");
             items[i].wanttogolist.push("inca");
-            db.collection('myCollection').update({ "username": global.username },
+            db.collection('myCollection').update({ "username": session.userid },
               { $set: { "wanttogolist": items[i].wanttogolist } });
             res.render('inca', { message: "" });
             break;
@@ -327,7 +395,7 @@ app.post('/inca', function (req, res) {
 
 app.post('/annapurna', function (req, res) {
   var MongoClient = require('mongodb').MongoClient;
-
+  session = req.session;
   MongoClient.connect("mongodb://127.0.0.1:27017/", function (err, client) {
     if (err) throw err;
     var db = client.db('myDB');
@@ -335,10 +403,10 @@ app.post('/annapurna', function (req, res) {
     db.collection('myCollection').find().toArray(function (err, items) {
       if (err) throw err;
       for (let i = 0; i < items.length; i++) {
-        if (items[i].username == global.username) {
+        if (items[i].username == session.userid) {
           if (!items[i].wanttogolist.includes('annapurna')) {
             items[i].wanttogolist.push("annapurna");
-            db.collection('myCollection').update({ "username": global.username },
+            db.collection('myCollection').update({ "username": session.userid },
               { $set: { "wanttogolist": items[i].wanttogolist } });
             res.render('annapurna', { message: "" });
             break;
