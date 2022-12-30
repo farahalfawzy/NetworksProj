@@ -419,14 +419,3 @@ app.post('/annapurna', function (req, res) {
     });
   });
 })
-
-function authenticationMiddleware() {
-  return (req, res, next) => {
-    console.log(`
-            req.session.passport.user: ${JSON.
-        stringify(req.session.passport)}`);
-    if (req.isAuthenticated()) return next(
-    );
-    res.redirect('/login')
-  }
-}//3lshan lw elragel 7awel y5osh mn3'yr ma y3ml login
