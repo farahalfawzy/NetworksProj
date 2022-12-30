@@ -46,6 +46,8 @@ app.post('/', function (req, res) {
   if (username == "" || password == "")
     res.render('login', { msg: "You must enter a valid input!" });
   else if (username == "admin" && password == "admin") {
+    session = req.session;
+    session.userid = username;
     res.redirect('home');
   }
   else {
