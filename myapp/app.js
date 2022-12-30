@@ -86,14 +86,14 @@ app.get('/home', function (req, res) {
     res.render('home');
   }
   else {
-    res.redirect('index', { title: "Forbidden Access!" });
+    res.redirect('index');
   }
 });
 app.get('/index', function (req, res) {
   res.render('index', { title: "Forbidden Access!" });
 })
 app.post('/index', function (req, res) {
-  res.redirect('/', { msg: "" });
+  res.redirect('/');
 })
 
 
@@ -141,70 +141,70 @@ app.get("/islands", function (req, res) {
   if (session.userid)
     res.render('islands');
   else
-    res.redirect('/index', { title: "Forbidden Access" });
+    res.redirect('/index');
 });
 app.get("/cities", function (req, res) {
   session = req.session;
   if (session.userid)
     res.render('cities');
   else
-    res.redirect('/index', { title: "Forbidden Access" });
+    res.redirect('/index');
 });
 app.get("/hiking", function (req, res) {
   session = req.session;
   if (session.userid)
     res.render('hiking');
   else
-    res.redirect('/index', { title: "Forbidden Access" });
+    res.redirect('/index');
 });
 app.get("/inca", function (req, res) {
   session = req.session;
   if (session.userid)
     res.render('inca',{message:""});
   else
-    res.redirect('/index', { title: "Forbidden Access" });
+    res.redirect('/index');
 });
 app.get("/annapurna", function (req, res) {
   session = req.session;
   if (session.userid)
     res.render('annapurna',{message:""});
   else
-    res.redirect('/index', { title: "Forbidden Access" });
+    res.redirect('/index');
 });
 app.get("/paris", function (req, res) {
   session = req.session;
   if (session.userid)
     res.render('paris',{message:""});
   else
-    res.redirect('/index', { title: "Forbidden Access" });
+    res.redirect('/index');
 });
 app.get("/rome", function (req, res) {
   session = req.session;
   if (session.userid)
     res.render('rome',{message:""});
   else
-    res.redirect('/index', { title: "Forbidden Access" });
+    res.redirect('/index');
 });
 app.get("/bali", function (req, res) {
   session = req.session;
   if (session.userid)
     res.render('bali',{message:""});
   else
-    res.redirect('/index', { title: "Forbidden Access" });
+    res.redirect('/index');
 });
 app.get("/santorini", function (req, res) {
   session = req.session;
   if (session.userid)
     res.render('santorini',{message:""});
   else
-    res.redirect('/index', { title: "Forbidden Access" });
+    res.redirect('/index');
 });
 app.get('/searchresults', function (req, res) {
   session = req.session;
   if (session.userid)
     res.render('searchresults');
   else
-    res.redirect('/index', { title: "Forbidden Access" });
+    res.redirect('/index');
 })
 
 //search bar
@@ -253,7 +253,7 @@ app.get('/wanttogo', function (req, res) {
     console.log("output", output);
   }
   else
-    res.redirect('index',{title:"Forbidden Access!"});
+    res.redirect('index');
 })
 app.post('/bali', function (req, res) {
   var MongoClient = require('mongodb').MongoClient;
