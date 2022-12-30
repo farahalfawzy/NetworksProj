@@ -204,7 +204,7 @@ app.get("/santorini", function (req, res) {
 app.get('/searchresults', function (req, res) {
   session = req.session;
   if (session.userid)
-    res.render('searchresults');
+    res.render('searchresults',{ result: [] });
   else
     res.redirect('/index');
 })
